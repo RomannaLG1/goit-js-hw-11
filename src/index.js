@@ -2,8 +2,9 @@ import './css/styles.css';
 import Notiflix from 'notiflix';
 import PicturesApiService from './js/api-servis';
 import picturesCardTpl from '../templates/pictures-card.hbs';
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import axios from 'axios';
 
 const refs = {
   searchForm: document.querySelector('#search-form'),
@@ -17,7 +18,6 @@ const refs = {
 let lightbox = new SimpleLightbox('.image', {
   captionsData: 'alt',
   captionDelay: 250,
- 
 });
 
 const picturesApiService = new PicturesApiService();
@@ -25,56 +25,59 @@ dotterHide();
 
 refs.searchForm.addEventListener('submit', onSearch);
 
-function onSearch(evt) {
+async function onSearch(evt) {
   evt.preventDefault();
 
- picturesApiService.query = evt.currentTarget.elements.searchQuery.value.trim();
- if (!picturesApiService.query) {
-  return;
- }
- picturesApiService.resetPage();
-picturesApiService.fetchSearchValue().then((hits) => {
-  if (!hits || hits.length === 0) {
-noFoundAnyImg();
-return;
+  picturesApiService.query =
+    evt.currentTarget.elements.searchQuery.value.trim();
+  if (!picturesApiService.query) {
+    return;
   }
-
- clearHitsContainer(); 
-  appendHitsMarkup(hits);
-  lightbox.refresh();
- dotterShow();
-});
-observer.observe(refs.guard);
-
+  picturesApiService.resetPage();
+  try {
+    const data = await picturesApiService.fetchSearchValue();
+    if (!data.hits || data.hits.length === 0) {
+      clearHitsContainer();
+      noFoundAnyImg();
+      return;
+    }
+    Notiflix.Notify.success(`Hoorey! We found ${data.totalHits} Images`);
+    clearHitsContainer();
+    appendHitsMarkup(data.hits);
+    lightbox.refresh();
+    dotterShow();
+  } catch {
+    messageError();
+  }
+  observer.observe(refs.guard);
 }
 
 const options = {
   root: null,
   rootMargin: '50px',
-  threshold: 1
-}
+  threshold: 1,
+};
 
 const observer = new IntersectionObserver(onLoadMore, options);
 
-
-function onLoadMore(entries, observer) {
-  entries.forEach(entry => {
+async function onLoadMore(entries, observer) {
+   entries.forEach(entry => {
     if (entry.isIntersecting) {
       dotterShow();
-      picturesApiService.fetchSearchValue().then(hits => {
-        if (!hits || hits.length === 0) {
-          observer.unobserve(refs.guard);
-          dotterHide();
-          endGalleryImg();
-          return;
-        }
-        appendHitsMarkup(hits);
-        lightbox.refresh();
-        dotterShow();
-      });
     }
-  });
+  })
+  const data = await picturesApiService.fetchSearchValue();
+  if (!data.hits || data.hits.length === 0) {
+    observer.unobserve(refs.guard);
+            dotterHide();
+            endGalleryImg();
+            return;
+   }
+   appendHitsMarkup(data.hits);
+         lightbox.refresh();
+         dotterShow();
 }
+ 
 
 function appendHitsMarkup(hits) {
   refs.galleryContainer.insertAdjacentHTML('beforeend', picturesCardTpl(hits));
@@ -93,16 +96,26 @@ function dotterHide() {
 }
 
 function noFoundAnyImg() {
-  Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.')
-return;
+  Notiflix.Notify.warning(
+    'Sorry, there are no images matching your search query. Please try again.'
+  );
+  return;
 }
 
 function endGalleryImg() {
-  Notiflix.Notify.warning("We're sorry, but you've reached the end of search results.")
-return;
+  Notiflix.Notify.warning(
+    "We're sorry, but you've reached the end of search results."
+  );
+  return;
 }
 
+function messageError() {
+  Notiflix.Notify.failure('Sorry, somthing was wranng! Can try');
+}
 
+// function succesMessage() {
+//   Notiflix.Notify.success(`Hoorey! We found ${data.totalHits} Images`);
+// }
 
 // const { height: cardHeight } = document
 //   .querySelector(".gallery")
