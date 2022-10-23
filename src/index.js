@@ -31,6 +31,7 @@ async function onSearch(evt) {
   picturesApiService.query =
     evt.currentTarget.elements.searchQuery.value.trim();
   if (!picturesApiService.query) {
+    noFoundAnyImg();
     return;
   }
   picturesApiService.resetPage();
@@ -41,11 +42,13 @@ async function onSearch(evt) {
       noFoundAnyImg();
       return;
     }
-    Notiflix.Notify.success(`Hoorey! We found ${data.totalHits} Images`);
+    Notiflix.Notify.success(`Hoorey! We found ${data.totalHits} images`);
     clearHitsContainer();
     appendHitsMarkup(data.hits);
     lightbox.refresh();
     dotterShow();
+    smoothScroll(picturesApiService.page);
+    console.log(picturesApiService.page);
   } catch {
     messageError();
   }
@@ -61,23 +64,23 @@ const options = {
 const observer = new IntersectionObserver(onLoadMore, options);
 
 async function onLoadMore(entries, observer) {
-   entries.forEach(entry => {
+  entries.forEach(entry => {
     if (entry.isIntersecting) {
       dotterShow();
     }
-  })
+  });
   const data = await picturesApiService.fetchSearchValue();
   if (!data.hits || data.hits.length === 0) {
     observer.unobserve(refs.guard);
-            dotterHide();
-            endGalleryImg();
-            return;
-   }
-   appendHitsMarkup(data.hits);
-         lightbox.refresh();
-         dotterShow();
+    dotterHide();
+    endGalleryImg();
+    return;
+  }
+  appendHitsMarkup(data.hits);
+  lightbox.refresh();
+  dotterShow();
+  smoothScroll(picturesApiService.page);
 }
- 
 
 function appendHitsMarkup(hits) {
   refs.galleryContainer.insertAdjacentHTML('beforeend', picturesCardTpl(hits));
@@ -113,15 +116,24 @@ function messageError() {
   Notiflix.Notify.failure('Sorry, somthing was wranng! Can try');
 }
 
-// function succesMessage() {
-//   Notiflix.Notify.success(`Hoorey! We found ${data.totalHits} Images`);
-// }
+function smoothScroll(currentPage) {
+  if (currentPage === 1 || currentPage === 2) {
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
 
-// const { height: cardHeight } = document
-//   .querySelector(".gallery")
-//   .firstElementChild.getBoundingClientRect();
+    window.scrollBy({
+      left: cardHeight * 1.5,
+      behavior: 'smooth',
+    });
+  }
 
-// window.scrollBy({
-//   top: cardHeight * 2,
-//   behavior: "smooth",
-// });
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 1.5,
+    behavior: 'smooth',
+  });
+}

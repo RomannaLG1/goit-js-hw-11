@@ -10,7 +10,8 @@ body {
   background-color: #fafafa;
   color: #eaeaea;
   line-height: 1.5;
-  background-color: #212121;
+  background-color: #464646;
+  padding-top: 90px;
 }
 
 .search-form {
@@ -22,37 +23,60 @@ body {
 
 }
 input {
+  padding: 10px;
    border: 13px;
-  background: #1D1F20;
+  background: transparent;
   position: relative;
-  border-radius: 3px;
+  
+  border-bottom: 1px solid #fafafa;
+  width: 300px;
+  /* border-radius: 3px; */
+  /* color: #fafafa; */
+  color: #282828;
+    background-image: linear-gradient(to right, #a1fff9, #00749b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 30px;
 }
 
-input:after {
-  content: '';
-  position: absolute;
-  top: calc(-1 * 13);
-  left: calc(-1 * 13);
-  height: calc(100% + 13 * 2);
-  width: calc(100% + 13 * 2);
-  background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
-  border-radius: calc(2 * 13);
+input:focus-visible,
+input:hover,
+input:focus {
+  outline: none;
+  
+}
+
+
+
+button {
+  padding: 10px;
+  /* height: 50px; */
+  width: 70px;
+  background-color: transparent;
+  border: none;
+  /* border-bottom: 1px solid #fafafa; */
+  background-image: url(../icons-search.png);
+  background-repeat: no-repeat;
+  background-size: 50px;
+  background-position: center;
+  transition: 250ms;
+}
+
+button:hover,
+button:focus {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.search-form {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   z-index: 10;
-  animation: animatedgradient 3s ease alternate infinite;
-  background-size: 300% 300%;
+  background-color: #464646;;
 }
 
-@keyframes animatedgradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
-}
 
 #search-box {
   font: inherit;
@@ -155,7 +179,7 @@ input:after {
 .dot {
   width: 20px;
   height: 20px;
-  background-color: grey;
+  background-color: rgb(124, 216, 255);
   display: inline-block;
   margin-top: 40px;
   border-radius: 50%;

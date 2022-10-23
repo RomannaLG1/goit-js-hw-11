@@ -21,14 +21,10 @@ export default class PicturesApiService {
       page: this.page,
       per_page: this.picturesPerPage,
     };
-    try {
-      const response = await axios.get(this.#BASE_URL, { params });
-      this.incrementPage();
-      return response.data;
-    } catch (error) {
-      console.error(error);
-      console.log(error.response.status);
-    }
+
+    const response = await axios.get(this.#BASE_URL, { params });
+    this.incrementPage();
+    return response.data;
   }
 
   incrementPage() {
