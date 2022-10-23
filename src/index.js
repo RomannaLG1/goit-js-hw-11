@@ -121,9 +121,10 @@ function smoothScroll(currentPage) {
     const { height: cardHeight } = document
       .querySelector('.gallery')
       .firstElementChild.getBoundingClientRect();
+    console.log('ffffff');
 
     window.scrollBy({
-      top: cardHeight * 1.5,
+      top: 0,
       behavior: 'smooth',
     });
   }
@@ -133,7 +134,7 @@ function smoothScroll(currentPage) {
     .firstElementChild.getBoundingClientRect();
 
   window.scrollBy({
-    top: cardHeight * 1.5,
+    top: cardHeight * 1.3,
     behavior: 'smooth',
   });
 }
